@@ -56,3 +56,23 @@ metrics <- left_join(scopus, alts, by = c("prism:doi"= "doi")) %>%
 
 save(metrics, file = "data/metrics.RData")
 
+metrics_display <-
+  metrics %>%
+  select(Title = `dc:title`,
+         Year = year,
+         Citations = `citedby-count`,
+         Alt = score,
+         Views = `abstract_views`,
+         Downloads = `download_count`) %>%
+  mutate_at(vars(Citations:Downloads), as.numeric) %>%
+  mutate(Year = as.integer(Year)) %>%
+  group_by(Year) %>%
+  mutate(baseline_cite = median(Citations, na.rm=TRUE)) %>%
+  ungroup()
+
+save(metrics_display, file = "data/metrics_display.RData")
+
+
+#shinyAppDir("R")
+
+
