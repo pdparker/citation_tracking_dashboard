@@ -63,12 +63,11 @@ metrics_display <-
          Citations = `citedby-count`,
          Alt = score,
          Views = `abstract_views`,
-         Downloads = `download_count`) %>%
-  mutate_at(vars(Citations:Downloads), as.numeric) %>%
+         Downloads = `download_count`,
+         Social = socialmedia) %>%
+  mutate_at(vars(Citations:Social), as.numeric) %>%
   mutate(Year = as.integer(Year)) %>%
-  group_by(Year) %>%
-  mutate(baseline_cite = median(Citations, na.rm=TRUE)) %>%
-  ungroup()
+  mutate_at(vars(Citations:Social), .funs = list(~replace(.,is.na(.),"0")))
 
 save(metrics_display, file = "data/metrics_display.RData")
 
