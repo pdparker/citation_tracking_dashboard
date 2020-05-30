@@ -28,18 +28,22 @@ server <- shinyServer(function(input, output, session) {
   })
   
   log <- reactive({
-    input$log
+    input$Button
+    isolate({inp <- input$log})
   })
   
   
   output$Table1 <- DT::renderDT(new_data(), filter = 'top',
-                                options = list(rowCallback = JS('
-                       function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                       if (parseFloat(aData[3]) < aData[7])
-                       $("td:eq(1)", nRow).css("color", "red");
-                       if (parseFloat(aData[3]) >= aData[7])
-                       $("td:eq(1)", nRow).css("color", "green");
-                       }') ))
+                                extensions = 'Buttons', options = list(
+                                  dom = 'Bfrtip',
+                                  style = 'bootstrap',
+                                  buttons = 
+                                    list('copy', 'print', list(
+                                      extend = 'collection',
+                                      buttons = c('csv', 'excel', 'pdf'),
+                                      text = 'Download'
+                                    )))
+  )
   
   output$Plot = renderPlot({
     p <- long_data() %>%
