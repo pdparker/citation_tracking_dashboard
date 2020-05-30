@@ -40,7 +40,7 @@ server <- shinyServer(function(input, output, session) {
   })
   
   output$Table1 <- DT::renderDataTable(
-    datatable(new_data(),
+    datatable(new_data(), 
                                 filter = 'top',
                                 extensions = 'Buttons', options = list(
                                   dom = 'Bfrtip',
