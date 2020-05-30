@@ -4,6 +4,8 @@ library(shinydashboard)
 library(DT)
 library(tidyverse)
 library(scales)
+
+z <- function(x){round((x-mean(x))/sd(x),3)}
 server <- shinyServer(function(input, output, session) {
   
   new_data <- reactive({
@@ -11,8 +13,13 @@ server <- shinyServer(function(input, output, session) {
     isolate({
       datadata <-  metrics_display %>%
         filter(Year %in% input$year_input[1]:input$year_input[2]) %>%
-        select(Title, Year, Citations, input$var_select)
+        select(Title, Year, Citations, input$var_select) %>%
+        mutate_at(vars(Citations,input$var_select), as.numeric) %>%
+        group_by(Year) %>%
+        mutate(baseline_cite = z(Citations)) %>%
+        ungroup()
     })
+    return(datadata)
   })
   
   long_data <- reactive({
@@ -32,8 +39,9 @@ server <- shinyServer(function(input, output, session) {
     isolate({inp <- input$log})
   })
   
-  
-  output$Table1 <- DT::renderDT(new_data(), filter = 'top',
+  output$Table1 <- DT::renderDataTable(
+    datatable(new_data(),
+                                filter = 'top',
                                 extensions = 'Buttons', options = list(
                                   dom = 'Bfrtip',
                                   style = 'bootstrap',
@@ -42,8 +50,8 @@ server <- shinyServer(function(input, output, session) {
                                       extend = 'collection',
                                       buttons = c('csv', 'excel', 'pdf'),
                                       text = 'Download'
-                                    )))
-  )
+                                    ))) 
+  ))
   
   output$Plot = renderPlot({
     p <- long_data() %>%
