@@ -54,5 +54,5 @@ metrics <- left_join(scopus, alts, by = c("prism:doi"= "doi")) %>%
          year = year(date)) %>%
   setNames(tolower(names(.)))
 
-
 save(metrics, file = "data/metrics.RData")
+
