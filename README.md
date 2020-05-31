@@ -18,3 +18,4 @@ Connect insight from tables to plots
 ![selection gif](img/selector.gif)
 
 
+
