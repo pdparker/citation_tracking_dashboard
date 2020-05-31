@@ -67,18 +67,17 @@ server <- shinyServer(function(input, output, session) {
         backgroundPosition = 'center')
     )
   
-  output$Plot = renderPlot({
+  output$Plot = renderPlotly({
     p <- long_data() %>%
       mutate(
         Citations = as.numeric(Citations)+.001,
         Values = as.numeric(Values)+.001
       ) %>%
-      ggplot(aes(x = Citations, y = Values, colour = Year)) +
+      ggplot(aes(x = Citations, y = Values, colour = Year, label=Title)) +
       geom_point(aes(size = selector)) +
-      facet_grid(~Variable)
-    if(log()==FALSE){
-      p 
-    }else{
+      facet_grid(~Variable) +
+      theme(legend.position = "none") 
+    if(log()==TRUE){
       p <- p +
         scale_x_continuous(trans = 'log10',
                            breaks = trans_breaks("log10", function(x) 10^x),
@@ -87,9 +86,9 @@ server <- shinyServer(function(input, output, session) {
                            breaks = trans_breaks("log10", function(x) 10^x),
                            labels = trans_format("log10", math_format(10^.x)))
       
-      p
+      
     }
-
+    ggplotly(p,tooltip = c("label", "colour") )
   })
   
 

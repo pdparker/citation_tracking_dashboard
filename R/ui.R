@@ -25,7 +25,7 @@ ui <- dashboardPage(
   dashboardBody(tags$div(
     tabName = "Publications",
     fluidRow(
-      column(12, plotOutput('Plot', height = 500))
+      column(12, plotlyOutput('Plot', height = 500))
     ),
     fluidRow(
       column(12, DT::dataTableOutput('Table1'))
