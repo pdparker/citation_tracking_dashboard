@@ -65,6 +65,7 @@ save(metrics, file = "data/metrics.RData")
 metrics_display <-
   metrics %>%
   select(Title = `dc:title`,
+         DOI = `prism:doi`,
          Year = year,
          Citations = `citedby-count`,
          Alt = score,

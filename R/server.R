@@ -15,6 +15,8 @@ server <- shinyServer(function(input, output, session) {
     input$Button
     isolate({
       datadata <-  metrics_display %>%
+        mutate(Title = paste0("<a href='https://www.doi.org/", DOI,"' target='_blank'>", Title,"</a>")) %>%
+        select(-DOI) %>%
         filter(Year %in% input$year_input[1]:input$year_input[2]) %>%
         select(Title, Year, Citations, input$var_select) %>%
         mutate_at(vars(Citations,input$var_select), as.numeric) %>%
@@ -30,6 +32,7 @@ server <- shinyServer(function(input, output, session) {
     isolate({
       s = input$Table1_rows_selected
       datadata <-  metrics_display %>%
+        select(-DOI) %>%
         filter(Year %in% input$year_input[1]:input$year_input[2]) %>%
         select(Title, Year,Citations, input$var_select) %>%
         rownames_to_column() %>%
@@ -46,7 +49,7 @@ server <- shinyServer(function(input, output, session) {
   })
   
   output$Table1 <- DT::renderDataTable(
-    datatable(new_data(), 
+    datatable(new_data(), escape=FALSE,
                                 filter = 'top',
                                 extensions = 'Buttons', options = list(
                                   dom = 'Bfrtip',
