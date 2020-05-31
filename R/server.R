@@ -4,6 +4,8 @@ library(shinydashboard)
 library(DT)
 library(tidyverse)
 library(scales)
+load("../data/metrics_display.RData")
+
 
 z <- function(x){round((x-mean(x))/sd(x),3)}
 server <- shinyServer(function(input, output, session) {
@@ -50,8 +52,16 @@ server <- shinyServer(function(input, output, session) {
                                       extend = 'collection',
                                       buttons = c('csv', 'excel', 'pdf'),
                                       text = 'Download'
-                                    ))) 
-  ))
+                                    ))) ) %>%
+      formatStyle(
+        columns = 'Title',
+        valueColumns = 'baseline_cite',
+        background = styleColorBar(range(new_data()$baseline_cite, na.rm=TRUE),
+                                   'lightblue'),
+        backgroundSize = '98% 88%',
+        backgroundRepeat = 'no-repeat',
+        backgroundPosition = 'center')
+    )
   
   output$Plot = renderPlot({
     p <- long_data() %>%

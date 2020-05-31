@@ -5,7 +5,6 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(shinyWidgets)
-load("../data/metrics_display.RData")
 
 ui <- dashboardPage(
   dashboardHeader(title = "Publication Dashboard"),
