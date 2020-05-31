@@ -4,6 +4,7 @@ library(shinydashboard)
 library(DT)
 library(tidyverse)
 library(scales)
+library(plotly)
 load("../data/metrics_display.RData")
 
 
@@ -27,9 +28,12 @@ server <- shinyServer(function(input, output, session) {
   long_data <- reactive({
     input$Button
     isolate({
+      s = input$Table1_rows_selected
       datadata <-  metrics_display %>%
         filter(Year %in% input$year_input[1]:input$year_input[2]) %>%
         select(Title, Year,Citations, input$var_select) %>%
+        rownames_to_column() %>%
+        mutate(selector = ifelse(rowname %in% s,"selected","not selected") ) %>%
         pivot_longer(cols = input$var_select, names_to = "Variable",
                      values_to = "Values") %>%
         mutate(Year = factor(as.character(Year)))
@@ -70,22 +74,25 @@ server <- shinyServer(function(input, output, session) {
         Values = as.numeric(Values)+.001
       ) %>%
       ggplot(aes(x = Citations, y = Values, colour = Year)) +
-      geom_point() +
+      geom_point(aes(size = selector)) +
       facet_grid(~Variable)
     if(log()==FALSE){
-      p
+      p 
     }else{
-      p +
+      p <- p +
         scale_x_continuous(trans = 'log10',
                            breaks = trans_breaks("log10", function(x) 10^x),
                            labels = trans_format("log10", math_format(10^.x))) +
         scale_y_continuous(trans = 'log10',
                            breaks = trans_breaks("log10", function(x) 10^x),
                            labels = trans_format("log10", math_format(10^.x)))
+      
+      p
     }
-    
+
   })
   
+
   }
 )
 

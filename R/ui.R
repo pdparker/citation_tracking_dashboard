@@ -5,6 +5,7 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(shinyWidgets)
+library(plotly)
 
 ui <- dashboardPage(
   dashboardHeader(title = "Publication Dashboard"),
@@ -20,7 +21,7 @@ ui <- dashboardPage(
                        selected = "Social"),
     checkboxInput("log", "Log Variables", FALSE),
     actionButton("Button", "Update")
-  ),
+    ),
   dashboardBody(tags$div(
     tabName = "Publications",
     fluidRow(
