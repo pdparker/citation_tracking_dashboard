@@ -13,4 +13,8 @@ what papers are not. Graphical indicators (blue) underlying titles give easy ins
 
 ![citations gif](img/baseline_citations.gif)
 
+# Connect Insight
+Connect insight from tables to plots
+![selection gif](img/selectors.gif)
+
 
