@@ -1,5 +1,11 @@
 # Setup ####
 # My API key is saved in my .Renviron
+# If one a mac:
+#   1. Open a terminal and type: cd ~
+#   2. type: touch .Renviron
+#   3. type: open .Renviron
+#   4. In the document type: Elsevier_API = "<<your Scopus API key>>"
+#   5. Close and save
 # Need to be on ACU VPN to work
 library(rscopus) # Extract scopus and plum metrics
 library(rAltmetric) # Extract altmetrics
