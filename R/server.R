@@ -11,6 +11,18 @@ load("../data/metrics_display.RData")
 z <- function(x){round((x-mean(x))/sd(x),3)}
 server <- shinyServer(function(input, output, session) {
   
+value_data <- reactive({
+    input$Button
+    isolate({
+      datadata <-  metrics_display %>%
+        filter(Year %in% input$year_input[1]:input$year_input[2]) %>%
+        mutate(SNIP = as.numeric(SNIP), SJR = as.numeric(SJR)) %>%
+        summarise(SNIP = round(mean(SNIP, na.rm=TRUE),2),
+                  SJR = round(mean(SJR, na.rm=TRUE),2))
+    })
+    return(datadata)
+  })
+  
   new_data <- reactive({
     input$Button
     isolate({
@@ -95,6 +107,33 @@ server <- shinyServer(function(input, output, session) {
   })
   
 
+  output$box_sjr <- renderValueBox({
+    valueBox(
+      subtitle = "SJR Mean",
+      value = value_data()$SJR,
+      #icon = "fa-area-chart"
+      color = case_when(
+        value_data()$SJR < 2 ~ 'red',
+        value_data()$SJR >= 2.5 ~ 'green',
+        TRUE ~ 'orange'
+        )
+    )
+  })
+  
+  output$box_snip <- renderValueBox({
+    valueBox(
+      subtitle = "SNIP Mean",
+      value = value_data()$SNIP,
+      #icon = "fa-area-chart"
+      color = case_when(
+        value_data()$SJR < 1.5 ~ 'red',
+        value_data()$SJR >= 2 ~ 'green',
+        TRUE ~ 'orange'
+      )
+    )
+  })
+  
+  
   }
 )
 

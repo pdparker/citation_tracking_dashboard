@@ -60,11 +60,49 @@ metrics <- left_join(scopus, alts, by = c("prism:doi"= "doi")) %>%
          year = year(date)) %>%
   setNames(tolower(names(.)))
 
+# Extract Journal Information
+issns <- metrics$issns %>% unique %>% na.omit()
+
+retrieve_metrics <- function(issn, token=NULL, sleep = .1){
+  require(rscopus)
+  nms = c("status", "year")
+  front = "http://api.elsevier.com/content/serial/title?issn="
+  end   = "&field=SJR,SNIP&view=STANDARD&apiKey="
+  if(is.null(token)){
+    if(rscopus::have_api_key()==TRUE){
+      token = Sys.getenv("Elsevier_API")
+    }else{cat("No API Key")}
+  }else{token = token}
+  query = paste0(front, issn, end, token)
+  
+  tmp = GET(query)
+  tmp = content(tmp, "text")
+  tmp = fromJSON(tmp, flatten = TRUE)
+  SNIP = data.frame(tmp$`serial-metadata-response`$entry$SNIPList.SNIP)
+  names(SNIP) <- c(nms, "SNIP")
+  SJR = data.frame(tmp$`serial-metadata-response`$entry$SJRList.SJR)
+  names(SJR) <- c(nms, "SJR")
+  out = c(issn = issn, SNIP = SNIP$SNIP,SJR = SJR$SJR)
+  return(out)
+  Sys.sleep(sleep)
+}
+retrieve_metrics_safely <- possibly(retrieve_metrics,otherwise = NULL)
+
+j_metrics <- map(issns, retrieve_metrics_safely)
+
+j_metrics  <- j_metrics %>% 
+  compact() %>% rbind_list()
+
+
+metrics <- left_join(metrics, j_metrics, by = c("issns"= "issn"))
+
 save(metrics, file = "data/metrics.RData")
 
 metrics_display <-
   metrics %>%
   select(Title = `dc:title`,
+         SJR = SJR,
+         SNIP = SNIP,
          DOI = `prism:doi`,
          Year = year,
          Citations = `citedby-count`,
@@ -79,6 +117,9 @@ metrics_display <-
 save(metrics_display, file = "data/metrics_display.RData")
 
 
+
+
 #shinyAppDir("R")
+
 
 

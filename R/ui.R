@@ -15,6 +15,8 @@ ui <- dashboardPage(
                 sep = "", ticks = FALSE),
     checkboxGroupInput("var_select", "Variables:",
                        choices = list("Alt Metrics" = "Alt", 
+                                      "SJR" = "SJR",
+                                      "SNIP" = "SNIP",
                                       "Abstract Views" = "Views", 
                                       "Downloads" = "Downloads",
                                       "Social Media" = "Social"),
@@ -24,6 +26,10 @@ ui <- dashboardPage(
     ),
   dashboardBody(tags$div(
     tabName = "Publications",
+    fluidRow(
+      valueBoxOutput('box_sjr'),
+      valueBoxOutput('box_snip')
+    ),
     fluidRow(
       column(12, plotlyOutput('Plot', height = 500))
     ),
