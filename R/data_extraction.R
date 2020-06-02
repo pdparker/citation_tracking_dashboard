@@ -61,9 +61,11 @@ metrics <- left_join(scopus, alts, by = c("prism:doi"= "doi")) %>%
   setNames(tolower(names(.)))
 
 # Extract Journal Information
-issns <- metrics$issns %>% unique %>% na.omit()
+metrics$combined_issn <- dplyr::coalesce(metrics$`prism:eissn`,metrics$`prism:issns`)
 
-retrieve_metrics <- function(issn, token=NULL, sleep = .1){
+issns <- metrics$combined_issn %>% unique %>% na.omit()
+
+retrieve_metrics <- function(issn, token=NULL, sleep = .05){
   require(rscopus)
   nms = c("status", "year")
   front = "http://api.elsevier.com/content/serial/title?issn="
@@ -86,6 +88,7 @@ retrieve_metrics <- function(issn, token=NULL, sleep = .1){
   return(out)
   Sys.sleep(sleep)
 }
+
 retrieve_metrics_safely <- possibly(retrieve_metrics,otherwise = NULL)
 
 j_metrics <- map(issns, retrieve_metrics_safely)
@@ -94,7 +97,7 @@ j_metrics  <- j_metrics %>%
   compact() %>% rbind_list()
 
 
-metrics <- left_join(metrics, j_metrics, by = c("issns"= "issn"))
+metrics <- left_join(metrics %>% select(-SJR, -SNIP), j_metrics, by = c("combined_issn"= "issn"))
 
 save(metrics, file = "data/metrics.RData")
 
@@ -116,10 +119,9 @@ metrics_display <-
 
 save(metrics_display, file = "data/metrics_display.RData")
 
-
-
-
 #shinyAppDir("R")
+
+
 
 
 

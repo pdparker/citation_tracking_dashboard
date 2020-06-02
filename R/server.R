@@ -111,7 +111,7 @@ value_data <- reactive({
     valueBox(
       subtitle = "SJR Mean",
       value = value_data()$SJR,
-      #icon = "fa-area-chart"
+      #icon = "fa-area-chart",
       color = case_when(
         value_data()$SJR < 2 ~ 'red',
         value_data()$SJR >= 2.5 ~ 'green',
@@ -124,7 +124,7 @@ value_data <- reactive({
     valueBox(
       subtitle = "SNIP Mean",
       value = value_data()$SNIP,
-      #icon = "fa-area-chart"
+      #icon = "fa-area-chart",
       color = case_when(
         value_data()$SJR < 1.5 ~ 'red',
         value_data()$SJR >= 2 ~ 'green',
