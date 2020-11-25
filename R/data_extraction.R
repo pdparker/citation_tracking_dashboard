@@ -13,6 +13,8 @@ library(tidyverse) # Data manipulations
 library(magrittr) #
 library(data.table)
 library(lubridate)
+library(httr)
+library(jsonlite)
 # Extract Scopus Data ####
 if(have_api_key()){
   scopus <- author_df(au_id = "23470098500")
@@ -61,11 +63,11 @@ metrics <- left_join(scopus, alts, by = c("prism:doi"= "doi")) %>%
   setNames(tolower(names(.)))
 
 # Extract Journal Information
-metrics$combined_issn <- dplyr::coalesce(metrics$`prism:eissn`,metrics$`prism:issns`)
+metrics$combined_issn <- dplyr::coalesce(metrics$`prism:eissn`,metrics$`prism:issn`)
 
 issns <- metrics$combined_issn %>% unique %>% na.omit()
 
-retrieve_metrics <- function(issn, token=NULL, sleep = .05){
+retrieve_metrics <- function(issn='00121649', token=NULL, sleep = .05){
   require(rscopus)
   nms = c("status", "year")
   front = "http://api.elsevier.com/content/serial/title?issn="
@@ -92,6 +94,8 @@ retrieve_metrics <- function(issn, token=NULL, sleep = .05){
 retrieve_metrics_safely <- possibly(retrieve_metrics,otherwise = NULL)
 
 j_metrics <- map(issns, retrieve_metrics_safely)
+
+rbind_list <- function(x) {do.call(rbind, x)}
 
 j_metrics  <- j_metrics %>% 
   compact() %>% rbind_list()
